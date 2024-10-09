@@ -4,8 +4,12 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"log/slog"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/jacute/prettylogger"
 )
 
 type Block struct {
@@ -59,4 +63,35 @@ func main() {
 		fmt.Printf("Hash: %x\n", block.Hash)
 		fmt.Println()
 	}
+
+	log := setupLogger(envLocal)
+	log.Info("starting url_shortener")
+	log.Debug("debug messages are enabled")
+}
+
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
+
+func setupLogger(env string) *slog.Logger {
+	var log *slog.Logger
+
+	switch env {
+	case envLocal:
+		log = slog.New(
+			prettylogger.NewColoredHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		)
+	case envDev:
+		log = slog.New(
+			prettylogger.NewColoredHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		)
+	case envProd:
+		log = slog.New(
+			prettylogger.NewColoredHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+		)
+	}
+
+	return log
 }
